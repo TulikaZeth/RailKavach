@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { AlertCircle, Info, Bell, Zap, Clock, Train as TrainIcon, ChevronDown } from "lucide-react";
 import { Alert, Train, Camera } from "@/types";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface AlertsPanelProps {
   alerts: Alert[];
@@ -10,6 +17,7 @@ interface AlertsPanelProps {
 
 export default function AlertsPanel({ alerts, selectedTrain, cameras }: AlertsPanelProps) {
   const [filterByTrain, setFilterByTrain] = useState(false);
+  const [expandedAlerts, setExpandedAlerts] = useState<string[]>([]);
   
   const filteredAlerts = filterByTrain && selectedTrain 
     ? alerts.filter(alert => alert.affectedTrains.includes(selectedTrain._id))
@@ -40,121 +48,206 @@ export default function AlertsPanel({ alerts, selectedTrain, cameras }: AlertsPa
   const getAlertTypeIcon = (alertType: string) => {
     switch (alertType) {
       case "animal_detected":
-        return "🐘";
+        return <AlertCircle size={18} />;
       case "animal_persistent":
-        return "⚠️";
+        return <Bell size={18} />;
       case "train_approaching":
-        return "🚂";
+        return <TrainIcon size={18} />;
       case "speed_reduction":
-        return "🔽";
+        return <Zap size={18} />;
       case "emergency":
-        return "🚨";
+        return <AlertCircle className="text-red-500" size={18} />;
       default:
-        return "📢";
+        return <Info size={18} />;
     }
   };
   
-  const getAlertColor = (severity: string) => {
+  const getSeverityColor = (severity: string) => {
     switch (severity) {
       case "critical":
-        return "bg-red-900 border-red-700";
+        return "text-red-500 border-red-500";
       case "high":
-        return "bg-orange-900 border-orange-700";
+        return "text-orange-500 border-orange-500";
       case "medium":
-        return "bg-yellow-900 border-yellow-700";
+        return "text-yellow-500 border-yellow-500";
       case "low":
-        return "bg-green-900 border-green-700";
+        return "text-green-500 border-green-500";
       default:
-        return "bg-gray-800 border-gray-600";
+        return "text-slate-500 border-slate-500";
     }
   };
   
-  const getStatusColor = (status: string) => {
+  const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {
       case "active":
-        return "bg-blue-600";
+        return "destructive";
       case "acknowledged":
-        return "bg-yellow-600";
+        return "secondary";
       case "resolved":
-        return "bg-green-600";
+        return "default";
       case "false_alarm":
-        return "bg-gray-600";
+        return "outline";
       default:
-        return "bg-gray-600";
+        return "outline";
     }
   };
-  
+
+  const toggleExpand = (alertId: string) => {
+    setExpandedAlerts(prev => 
+      prev.includes(alertId) 
+        ? prev.filter(id => id !== alertId) 
+        : [...prev, alertId]
+    );
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { 
+        staggerChildren: 0.07
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { 
+      y: 0, 
+      opacity: 1,
+      transition: { type: "spring", stiffness: 300, damping: 24 }
+    },
+    exit: { opacity: 0, y: -20, transition: { duration: 0.2 } }
+  };
+
   return (
-    <div className="bg-gray-900 text-gray-100 p-4 rounded-lg shadow-lg">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-gray-100">Alert Notifications</h2>
-        <div className="flex items-center">
-          <input 
-            type="checkbox" 
-            checked={filterByTrain} 
-            onChange={() => setFilterByTrain(!filterByTrain)}
-            className="mr-2"
-          />
-          <span className="text-sm text-gray-300">
-            Show only alerts for selected train
-          </span>
+    <Card className="shadow-xl border-slate-800 bg-slate-900">
+      <CardHeader className="pb-2">
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-xl text-slate-100 flex items-center gap-2">
+            <Bell className="h-5 w-5" /> Alert Notifications
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <Switch 
+              id="filter-train" 
+              checked={filterByTrain} 
+              onCheckedChange={setFilterByTrain}
+            />
+            <Label htmlFor="filter-train" className="text-sm text-slate-400">
+              {selectedTrain ? `Filter for ${selectedTrain.trainId}` : "Filter by selected train"}
+            </Label>
+          </div>
         </div>
-      </div>
-      
-      <div className="space-y-3">
-        <AnimatePresence>
-          {sortedAlerts.length > 0 ? (
-            sortedAlerts.map((alert) => (
-              <motion.div 
-                key={alert._id}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className={`border-l-4 ${getAlertColor(alert.alertSeverity)} bg-gray-800 rounded p-3`}
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex items-center">
-                    <span className="text-xl mr-2">{getAlertTypeIcon(alert.alertType)}</span>
-                    <div>
-                      <h3 className="font-semibold text-white">
-                        {alert.alertType.replace("_", " ").charAt(0).toUpperCase() + alert.alertType.replace("_", " ").slice(1)}
-                      </h3>
-                      <p className="text-sm text-gray-400">
-                        {getCameraName(alert.camera)}
-                      </p>
+      </CardHeader>
+      <CardContent>
+        <motion.div 
+          className="space-y-3 mt-2"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <AnimatePresence mode="popLayout">
+            {sortedAlerts.length > 0 ? (
+              sortedAlerts.map((alert) => {
+                const isExpanded = expandedAlerts.includes(alert._id);
+                return (
+                  <motion.div 
+                    key={alert._id}
+                    layout
+                    variants={itemVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    className={`border-l-4 ${getSeverityColor(alert.alertSeverity)} bg-slate-800/60 rounded-md shadow-md`}
+                  >
+                    <div 
+                      className="p-3 cursor-pointer"
+                      onClick={() => toggleExpand(alert._id)}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-slate-800 rounded-full">
+                            {getAlertTypeIcon(alert.alertType)}
+                          </div>
+                          <div>
+                            <h3 className="font-medium text-slate-100">
+                              {alert.alertType.split("_").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")}
+                            </h3>
+                            <div className="flex items-center gap-2 text-xs text-slate-400">
+                              <Clock size={12} />
+                              {new Date(alert.createdAt).toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Badge variant={getStatusVariant(alert.status)}>
+                                  {alert.status.charAt(0).toUpperCase() + alert.status.slice(1).replace("_", " ")}
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Alert Status</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <ChevronDown 
+                            size={16} 
+                            className={`text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
+                          />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <span className={`px-2 py-1 text-xs rounded-full text-white ${getStatusColor(alert.status)}`}>
-                      {alert.status.charAt(0).toUpperCase() + alert.status.slice(1)}
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="mb-3 text-sm text-gray-300">
-                  <p className="mb-1">
-                    Severity: {alert.alertSeverity.charAt(0).toUpperCase() + alert.alertSeverity.slice(1)}
-                  </p>
-                  <p>
-                    Time: {new Date(alert.createdAt).toLocaleString()}
-                  </p>
-                  {alert.notes && (
-                    <p className="mt-2 italic text-gray-400">
-                      "{alert.notes}"
-                    </p>
-                  )}
-                </div>
-                
-              
+                    
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="overflow-hidden"
+                        >
+                          <Separator className="bg-slate-700/50" />
+                          <div className="p-3 text-sm space-y-2 text-slate-300">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-slate-400">Camera:</span>
+                              <span>{getCameraName(alert.camera)}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-slate-400">Severity:</span>
+                              <span className={`capitalize ${getSeverityColor(alert.alertSeverity).split(" ")[0]}`}>
+                                {alert.alertSeverity}
+                              </span>
+                            </div>
+                            {alert.notes && (
+                              <div className="pt-1">
+                                <span className="font-medium text-slate-400">Notes:</span>
+                                <p className="mt-1 italic text-slate-400 bg-slate-800/50 p-2 rounded">
+                                  {alert.notes}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                );
+              })
+            ) : (
+              <motion.div 
+                variants={itemVariants}
+                className="text-center py-8 text-slate-400 bg-slate-800/30 rounded-md"
+              >
+                <Info className="mx-auto mb-2" />
+                No alerts found
               </motion.div>
-            ))
-          ) : (
-            <div className="text-center py-8 text-gray-400">
-              No alerts found
-            </div>
-          )}
-        </AnimatePresence>
-      </div>
-    </div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </CardContent>
+    </Card>
   );
 }
