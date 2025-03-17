@@ -1,40 +1,40 @@
-'use client'; // This is necessary to use client-side features like onClick
+"use client";
 
-import { useState } from 'react';
+// This is necessary to use client-side features like onClick
 
 export default function SendWhatsAppButton() {
-  const [loading, setLoading] = useState(false);
-  const [response, setResponse] = useState(null);
 
-  const handleSendWhatsApp = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch('/api/send-msg', {
-        method: 'POST'
-      });
-      const data = await res.json();
-      setResponse(data);
-    } catch (error) {
-      setResponse({ error: error.message });
-    } finally {
-      setLoading(false);
-    }
-  };
+    const cakc = async (speed: number, lat: number, long: number) => {
+        try {
+            const response = await fetch("/api/gemini", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ speed, lat, long }),
+            });
+    
+            const data = await response.json();
+            return data.distance || 0;
+        } catch (error) {
+            console.error("Error calling local API:", error);
+            return 0;
+        }
+    };
 
   return (
     <div>
-      <button 
-        onClick={handleSendWhatsApp} 
-        disabled={loading}
-        style={{ padding: '10px 20px', backgroundColor: '#0070f3', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
+      <button
+        onClick={() => cakc(60, 12.9716, 77.5946)}
+        style={{
+          padding: "10px 20px",
+          backgroundColor: "#0070f3",
+          color: "white",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+        }}
       >
-        {loading ? 'Sending...' : 'Send WhatsApp Message'}
+        Button
       </button>
-      {response && (
-        <div style={{ marginTop: '20px' }}>
-          <pre>{JSON.stringify(response, null, 2)}</pre>
-        </div>
-      )}
     </div>
   );
 }

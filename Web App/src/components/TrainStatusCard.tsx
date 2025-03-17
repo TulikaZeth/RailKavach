@@ -11,7 +11,11 @@ interface TrainStatusCardProps {
   alerts: Alert[];
 }
 
+
+
 export default function TrainStatusCard({ train: initialTrain, alerts = [] }: TrainStatusCardProps) {
+
+
   const [train, setTrain] = useState(initialTrain);
   const [distanceToAlert, setDistanceToAlert] = useState<number | null>(null);
   const [isSlowingDown, setIsSlowingDown] = useState(false);
@@ -19,6 +23,8 @@ export default function TrainStatusCard({ train: initialTrain, alerts = [] }: Tr
   const [isStopped, setIsStopped] = useState(false);
   const speedGaugeRef = useRef<HTMLDivElement>(null);
   
+  const [alertText, setAlertText] = useState<string>('');
+
   // Filter out resolved alerts
   const unresolvedAlerts = alerts.filter((alert) => alert.status !== "resolved");
   
@@ -51,6 +57,22 @@ export default function TrainStatusCard({ train: initialTrain, alerts = [] }: Tr
     setIntialSpeed(initialTrain.currentSpeed)
   }, [])
 
+  const calcSafeDistance = async (speed: number, lat: number, long: number) => {
+    try {
+      const response = await fetch("/api/gemini", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ speed, lat, long }),
+      });
+  
+      const data = await response.json();
+      return data.distance || 5;
+    } catch (error) {
+      console.error("Error calling local API:", error);
+      return 0;
+    }
+  }
+
   useEffect(() => {
     if (isStopped) return; // Stop all updates if the train is stopped
     
@@ -58,6 +80,9 @@ export default function TrainStatusCard({ train: initialTrain, alerts = [] }: Tr
     let directionY = Math.random() * 0.0001 - 0.00005;
     let currentSpeed = initialTrain.currentSpeed;
     
+    const safeDistance = calcSafeDistance(currentSpeed, train.currentLocation.coordinates[1], train.currentLocation.coordinates[0]);
+    console.log(safeDistance)
+
     const movementInterval = setInterval(() => {
       // Only trigger alerts if there are unresolved alerts
       if (unresolvedAlerts.length > 0 && distanceToAlert === null && Math.random() < 0.1) {
@@ -65,6 +90,7 @@ export default function TrainStatusCard({ train: initialTrain, alerts = [] }: Tr
         setDistanceToAlert(newDistance);
         if (!playedAudio) {
           console.log("VOICE ALERT: Animal detected ahead!");
+          setAlertText(`Animal detected ahead. Train stopping in ${newDistance} kilometers.`);
           setPlayedAudio(true);
         }
       }
@@ -80,6 +106,7 @@ export default function TrainStatusCard({ train: initialTrain, alerts = [] }: Tr
             setDistanceToAlert(null);
             setIsSlowingDown(false);
             setPlayedAudio(false);
+            setAlertText('Train Stopped due to animal on track.');
           }
           return newDistance;
         });
@@ -136,6 +163,21 @@ export default function TrainStatusCard({ train: initialTrain, alerts = [] }: Tr
     return () => clearInterval(movementInterval);
   }, [initialTrain.currentSpeed, distanceToAlert, isSlowingDown, playedAudio, isStopped, unresolvedAlerts]);
   
+
+  useEffect(() => {
+    if (alertText && 'speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(alertText);
+      utterance.lang = 'en-US'; // Set the language
+      utterance.rate = 1; // Speed of speech (0.1 to 10)
+      utterance.pitch = 1; // Pitch of speech (0 to 2)
+      window.speechSynthesis.speak(utterance);
+    } else if (!('speechSynthesis' in window)) {
+      console.error('Web Speech API is not supported in this browser.');
+    }
+  }, [alertText]); // Run this effect whenever alertText changes
+
+ 
+
   const speedReduction = getSpeedReduction(distanceToAlert);
   
   return (
