@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { motion } from 'framer-motion';
 import { getLatestDetections, getAlerts, AnimalDetection, AlertResult } from '@/services/detectionService';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { RefreshCcw } from 'lucide-react';
 
 export default function AnimalDetector() {
   const [detections, setDetections] = useState<AnimalDetection[]>([]);
@@ -21,9 +28,7 @@ export default function AnimalDetector() {
         imageUrl: 'some-image-url', // Replace with actual image URL if available
         status: 'detected',
       };
-
-      console.log(detectionData)
-
+      console.log(detectionData);
       const response = await axios.post('/api/detections', detectionData);
       console.log('Detection event created:', response.data);
       return response.data._id; // Return the ID of the created detection event
@@ -46,7 +51,6 @@ export default function AnimalDetector() {
         notifiedStations: ["67d3417a5a29d6d2dc98445f"], // Add notified stations if applicable
         notes: `Animal detected: ${animal.class_name} with confidence ${(animal.confidence * 100).toFixed(1)}%`,
       };
-
       const response = await axios.post('/api/alerts', alertData);
       console.log('Alert created:', response.data);
     } catch (err) {
@@ -60,7 +64,6 @@ export default function AnimalDetector() {
       const detectionData = await getLatestDetections();
       if (detectionData.objects.length > 0) {
         setDetections(detectionData.objects);
-
         // Create detection events and alerts for new detections
         for (const animal of detectionData.objects) {
           try {
@@ -98,7 +101,6 @@ export default function AnimalDetector() {
   const checkForAnimals = async () => {
     setIsLoading(true);
     setError(null);
-
     try {
       await Promise.all([fetchDetections(), fetchAlerts()]);
       setLastUpdated(new Date());
@@ -109,73 +111,196 @@ export default function AnimalDetector() {
     }
   };
 
+  // Manual refresh handler
+  const handleRefresh = () => {
+    checkForAnimals();
+  };
+
   useEffect(() => {
     // Initial check
     checkForAnimals();
-
     // Set up polling interval
     const intervalId = setInterval(checkForAnimals, 30000); // Check every 30 seconds
-
     // Cleanup interval on unmount
     return () => clearInterval(intervalId);
   }, []);
 
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+  };
+
+  const listItemVariants = {
+    hidden: { opacity: 0, x: -10 },
+    visible: (i: number) => ({ 
+      opacity: 1, 
+      x: 0, 
+      transition: { delay: i * 0.1, duration: 0.3 } 
+    })
+  };
+
+  const getConfidenceColor = (confidence: number) => {
+    if (confidence > 0.8) return "bg-green-500";
+    if (confidence > 0.5) return "bg-yellow-500";
+    return "bg-red-500";
+  };
+
   return (
-    <div className="p-4 bg-white rounded-lg shadow">
-      <h2 className="text-xl font-bold mb-4">Animal Detection System</h2>
-      
-      {/* Error Message */}
-      {error && (
-        <div className="text-red-600 mb-4">
-          {error}
-        </div>
-      )}
+    <motion.div 
+      initial="hidden"
+      animate="visible"
+      variants={cardVariants}
+      className="bg-[#121212] text-white min-h-screen p-6"
+    >
+      <Card className="bg-[#101828] border-0 shadow-xl">
+        <CardHeader className="border-b border-zinc-800">
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle className="text-2xl font-bold bg-gradient-to-r text-[#ffff] ">
+                Camera Detection
+              </CardTitle>
+              <CardDescription className="text-zinc-400">
+                Real-time monitoring and alerts
+              </CardDescription>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleRefresh}
+              className="border-zinc-700 cursor-pointer hover:bg-zinc-400"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <RefreshCcw  className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCcw className="mr-2 h-4 w-4" />
+              )}
+              Refresh
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-6">
+          {/* Error Message */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-6"
+            >
+              <Alert variant="destructive" className="bg-red-900/30 border border-red-800 text-red-300">
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            </motion.div>
+          )}
 
-      {/* Loading State */}
-      {isLoading && (
-        <div className="mb-4 text-gray-500">
-          Loading...
-        </div>
-      )}
-
-      {/* Latest Detections */}
-      <div className="mb-6">
-        <h3 className="font-semibold text-lg mb-2">Latest Detections</h3>
-        {detections.length > 0 ? (
-          <ul className="list-disc pl-5">
-            {detections.map((animal, index) => (
-              <li key={index} className="mb-1">
-                {animal.class_name} (Confidence: {(animal.confidence * 100).toFixed(1)}%)
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-gray-500">No animals detected in the last scan</p>
-        )}
-      </div>
-      
-      {/* Active Alerts */}
-      <div className="mb-6">
-        <h3 className="font-semibold text-lg mb-2">Active Alerts</h3>
-        {alerts.length > 0 ? (
-          <ul className="list-disc pl-5">
-            {alerts.map((alert, index) => (
-              <li key={index} className="mb-1 text-red-600 font-medium">
-                {alert.object} - Detected {alert.consecutive_count} consecutive times
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-gray-500">No consecutive detections</p>
-        )}
-      </div>
-      
-      {/* Last Updated Time */}
-      {lastUpdated && (
-        <p className="text-sm text-gray-500">
-          Last updated: {lastUpdated.toLocaleTimeString()}
-        </p>
-      )}
-    </div>
+          {/* Latest Detections */}
+          <motion.div 
+            variants={cardVariants}
+            className="mb-8"
+          >
+            <h3 className="text-lg font-medium mb-4 text-zinc-200 flex items-center">
+              <span className="w-2 h-2 bg-blue-500 rounded-full inline-block mr-2"></span>
+              Latest Detections
+            </h3>
+            
+            {isLoading ? (
+              <div className="space-y-2">
+                <Skeleton className="h-12 w-full bg-zinc-800" />
+                <Skeleton className="h-12 w-full bg-zinc-800" />
+                <Skeleton className="h-12 w-full bg-zinc-800" />
+              </div>
+            ) : detections.length > 0 ? (
+              <div className="grid gap-3">
+                {detections.map((animal, index) => (
+                  <motion.div
+                    key={index}
+                    custom={index}
+                    variants={listItemVariants}
+                    className="flex items-center justify-between bg-zinc-800/50 p-3 rounded-lg border border-zinc-700"
+                  >
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 rounded-full bg-zinc-700 flex items-center justify-center mr-3">
+                        {animal.class_name.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="font-medium text-zinc-200">{animal.class_name}</span>
+                    </div>
+                    <Badge className={`${getConfidenceColor(animal.confidence)} text-white`}>
+                      {(animal.confidence * 100).toFixed(1)}%
+                    </Badge>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <motion.p 
+                variants={cardVariants}
+                className="text-zinc-500 bg-zinc-800/30 p-4 rounded-lg border border-zinc-800 text-center"
+              >
+                No animals detected in the last scan
+              </motion.p>
+            )}
+          </motion.div>
+          
+          {/* Active Alerts */}
+          <motion.div 
+            variants={cardVariants}
+            className="mb-8"
+          >
+            <h3 className="text-lg font-medium mb-4 text-zinc-200 flex items-center">
+              <span className="w-2 h-2 bg-red-500 rounded-full inline-block mr-2"></span>
+              Active Alerts
+            </h3>
+            
+            {isLoading ? (
+              <div className="space-y-2">
+                <Skeleton className="h-12 w-full bg-zinc-800" />
+                <Skeleton className="h-12 w-full bg-zinc-800" />
+              </div>
+            ) : alerts.length > 0 ? (
+              <div className="space-y-3">
+                {alerts.map((alert, index) => (
+                  <motion.div
+                    key={index}
+                    custom={index}
+                    variants={listItemVariants}
+                    className="bg-red-900/30 border border-red-800 p-4 rounded-lg flex items-center justify-between"
+                  >
+                    <div>
+                      <span className="font-bold text-red-300">{alert.object}</span>
+                      <p className="text-zinc-400 text-sm">
+                        Consecutive detections: {alert.consecutive_count}
+                      </p>
+                    </div>
+                    <Badge variant="outline" className="border-red-700 text-red-300">
+                      HIGH RISK
+                    </Badge>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <motion.p 
+                variants={cardVariants}
+                className="text-zinc-500 bg-zinc-800/30 p-4 rounded-lg border border-zinc-800 text-center"
+              >
+                No consecutive detections
+              </motion.p>
+            )}
+          </motion.div>
+          
+          {/* Last Updated Time */}
+          {lastUpdated && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="text-sm text-zinc-500 flex items-center justify-center bg-zinc-800/30 p-2 rounded-lg border border-zinc-800"
+            >
+              Last updated: {lastUpdated.toLocaleTimeString()}
+            </motion.div>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }

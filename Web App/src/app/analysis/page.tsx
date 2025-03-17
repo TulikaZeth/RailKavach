@@ -6,21 +6,21 @@ import dynamic from 'next/dynamic';
 
 // Basic components we'll use directly, without shadcn/ui
 const Card = ({ children, className = '' }: { children: React.ReactNode, className?: string }) => (
-  <div className={`bg-white rounded-lg shadow-md overflow-hidden ${className}`}>
+  <div className={`bg-[#1e1e1e] rounded-lg shadow-md overflow-hidden ${className}`}>
     {children}
   </div>
 );
 
 const CardHeader = ({ children }: { children: React.ReactNode }) => (
-  <div className="px-6 py-4 border-b border-gray-200">{children}</div>
+  <div className="px-6 py-4 border-b border-gray-700">{children}</div>
 );
 
 const CardTitle = ({ children }: { children: React.ReactNode }) => (
-  <h3 className="text-lg font-medium text-gray-900">{children}</h3>
+  <h3 className="text-lg font-medium text-gray-100">{children}</h3>
 );
 
 const CardDescription = ({ children }: { children: React.ReactNode }) => (
-  <p className="text-sm text-gray-500 mt-1">{children}</p>
+  <p className="text-sm text-gray-400 mt-1">{children}</p>
 );
 
 const CardContent = ({ children }: { children: React.ReactNode }) => (
@@ -258,13 +258,13 @@ export default function AnalysisPage() {
     
     return (
       <div className="mt-4">
-        <h4 className="text-sm font-medium mb-2">{title}</h4>
+        <h4 className="text-sm font-medium mb-2 text-gray-100">{title}</h4>
         <div className="space-y-2">
           {data.map((item, i) => (
             <div key={i} className="flex items-center">
-              <span className="text-sm w-24 truncate">{item.name}</span>
+              <span className="text-sm w-24 truncate text-gray-300">{item.name}</span>
               <div className="flex-1 ml-2">
-                <div className="relative h-6 bg-gray-100 rounded">
+                <div className="relative h-6 bg-gray-700 rounded">
                   <div 
                     className="absolute top-0 left-0 h-6 bg-blue-500 rounded" 
                     style={{ width: `${(item.value / max) * 100}%` }}
@@ -288,7 +288,7 @@ export default function AnalysisPage() {
     
     return (
       <div className="mt-4">
-        <h4 className="text-sm font-medium mb-2">{title}</h4>
+        <h4 className="text-sm font-medium mb-2 text-gray-100">{title}</h4>
         <div className="flex items-center justify-center">
           <svg width="200" height="200" viewBox="0 0 100 100">
             {data.map((item, i) => {
@@ -330,7 +330,7 @@ export default function AnalysisPage() {
                 className="w-3 h-3 mr-1 rounded-sm"
                 style={{ backgroundColor: ANIMAL_COLORS[item.name] || `hsl(${i * 50}, 70%, 50%)` }}
               ></div>
-              <span className="text-xs">{item.name}: {Math.round(item.value / total * 100)}%</span>
+              <span className="text-xs text-gray-300">{item.name}: {Math.round(item.value / total * 100)}%</span>
             </div>
           ))}
         </div>
@@ -344,7 +344,7 @@ export default function AnalysisPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="  w-full px-16 py-8 bg-[#121212] min-h-screen">
       <motion.div 
         initial="hidden"
         animate="visible"
@@ -352,16 +352,16 @@ export default function AnalysisPage() {
         transition={{ duration: 0.5 }}
         className="mb-8"
       >
-        <h1 className="text-3xl font-bold mb-2">Wildlife Detection Analysis</h1>
-        <p className="text-gray-600 mb-6">
+        <h1 className="text-3xl font-bold mb-2 text-gray-100">Wildlife Detection Analysis</h1>
+        <p className="text-gray-400 mb-6">
           Interactive dashboard showing animal detection patterns and hotspots
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Time Period</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Time Period</label>
             <select 
-              className="w-full rounded-md border border-gray-300 p-2"
+              className="w-full rounded-md border border-gray-600 p-2 bg-[#1e1e1e] text-gray-100"
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value)}
             >
@@ -372,9 +372,9 @@ export default function AnalysisPage() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Animal Type</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Animal Type</label>
             <select 
-              className="w-full rounded-md border border-gray-300 p-2"
+              className="w-full rounded-md border border-gray-600 p-2 bg-[#1e1e1e] text-gray-100"
               value={animalFilter}
               onChange={(e) => setAnimalFilter(e.target.value)}
             >
@@ -391,9 +391,9 @@ export default function AnalysisPage() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Railway Section</label>
+            <label className="block text-sm font-medium text-gray-300 mb-1">Railway Section</label>
             <select 
-              className="w-full rounded-md border border-gray-300 p-2"
+              className="w-full rounded-md border border-gray-600 p-2 bg-[#1e1e1e] text-gray-100"
               value={railwaySection}
               onChange={(e) => setRailwaySection(e.target.value)}
             >
@@ -407,19 +407,19 @@ export default function AnalysisPage() {
           
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Date From</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Date From</label>
               <input 
                 type="date" 
-                className="w-full rounded-md border border-gray-300 p-2"
+                className="w-full rounded-md border border-gray-600 p-2 bg-[#1e1e1e] text-gray-100"
                 value={dateFrom}
                 onChange={(e) => setDateFrom(e.target.value)}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Date To</label>
+              <label className="block text-sm font-medium text-gray-300 mb-1">Date To</label>
               <input 
                 type="date" 
-                className="w-full rounded-md border border-gray-300 p-2"
+                className="w-full rounded-md border border-gray-600 p-2 bg-[#1e1e1e] text-gray-100"
                 value={dateTo}
                 onChange={(e) => setDateTo(e.target.value)}
               />
@@ -436,7 +436,7 @@ export default function AnalysisPage() {
           </button>
           <button 
             onClick={() => alert('Export functionality would be implemented here')}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+            className="px-4 py-2 bg-gray-700 text-gray-100 rounded-md hover:bg-gray-600 transition-colors"
           >
             Export Data
           </button>
@@ -444,13 +444,13 @@ export default function AnalysisPage() {
       </motion.div>
       
       <div className="mb-6">
-        <div className="border-b border-gray-200">
+        <div className="border-b border-gray-700">
           <nav className="flex -mb-px">
             <button
               className={`py-2 px-4 text-center border-b-2 font-medium text-sm ${
                 activeTab === 'map' 
-                  ? 'border-blue-500 text-blue-600' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-400' 
+                  : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500'
               }`}
               onClick={() => setActiveTab('map')}
             >
@@ -459,8 +459,8 @@ export default function AnalysisPage() {
             <button
               className={`py-2 px-4 text-center border-b-2 font-medium text-sm ${
                 activeTab === 'stats' 
-                  ? 'border-blue-500 text-blue-600' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-400' 
+                  : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500'
               }`}
               onClick={() => setActiveTab('stats')}
             >
@@ -469,8 +469,8 @@ export default function AnalysisPage() {
             <button
               className={`py-2 px-4 text-center border-b-2 font-medium text-sm ${
                 activeTab === 'trends' 
-                  ? 'border-blue-500 text-blue-600' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-400' 
+                  : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500'
               }`}
               onClick={() => setActiveTab('trends')}
             >
@@ -576,25 +576,25 @@ export default function AnalysisPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <p className="text-sm text-gray-500">Total Detections</p>
-                        <p className="text-2xl font-bold">{detections.length}</p>
+                      <div className="bg-[#1e1e1e] p-4 rounded-lg">
+                        <p className="text-sm text-gray-400">Total Detections</p>
+                        <p className="text-2xl font-bold text-gray-100">{detections.length}</p>
                       </div>
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <p className="text-sm text-gray-500">Unique Cameras</p>
-                        <p className="text-2xl font-bold">
+                      <div className="bg-[#1e1e1e] p-4 rounded-lg">
+                        <p className="text-sm text-gray-400">Unique Cameras</p>
+                        <p className="text-2xl font-bold text-gray-100">
                           {new Set(detections.map(d => d.camera._id)).size}
                         </p>
                       </div>
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <p className="text-sm text-gray-500">High Confidence</p>
-                        <p className="text-2xl font-bold">
+                      <div className="bg-[#1e1e1e] p-4 rounded-lg">
+                        <p className="text-sm text-gray-400">High Confidence</p>
+                        <p className="text-2xl font-bold text-gray-100">
                           {detections.filter(d => d.confidence >= 80).length}
                         </p>
                       </div>
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <p className="text-sm text-gray-500">Animal Types</p>
-                        <p className="text-2xl font-bold">
+                      <div className="bg-[#1e1e1e] p-4 rounded-lg">
+                        <p className="text-sm text-gray-400">Animal Types</p>
+                        <p className="text-2xl font-bold text-gray-100">
                           {new Set(detections.map(d => d.animalType)).size}
                         </p>
                       </div>
@@ -647,7 +647,7 @@ export default function AnalysisPage() {
                           i % Math.ceil(arr.length / 10) === 0 && (
                             <div 
                               key={i}
-                              className="text-xs text-gray-500 text-center"
+                              className="text-xs text-gray-400 text-center"
                               style={{
                                 width: `${(100 / arr.length) * Math.ceil(arr.length / 10)}%`,
                                 marginLeft: i === 0 ? 0 : `${(100 / arr.length) * (i - Math.ceil(arr.length / 10))}%`
@@ -671,9 +671,9 @@ export default function AnalysisPage() {
                   <CardContent>
                     <div className="space-y-2">
                       {getDetectionsBySection().slice(0, 5).map((item, i) => (
-                        <div key={i} className="flex justify-between items-center py-1 border-b">
-                          <span className="text-sm">{item.name}</span>
-                          <span className="font-medium">{item.value} detections</span>
+                        <div key={i} className="flex justify-between items-center py-1 border-b border-gray-700">
+                          <span className="text-sm text-gray-300">{item.name}</span>
+                          <span className="font-medium text-gray-100">{item.value} detections</span>
                         </div>
                       ))}
                     </div>
@@ -690,9 +690,9 @@ export default function AnalysisPage() {
                         .sort((a, b) => b.value - a.value)
                         .slice(0, 5)
                         .map((item, i) => (
-                          <div key={i} className="flex justify-between items-center py-1 border-b">
-                            <span className="text-sm">{item.name}</span>
-                            <span className="font-medium">{item.value} detections</span>
+                          <div key={i} className="flex justify-between items-center py-1 border-b border-gray-700">
+                            <span className="text-sm text-gray-300">{item.name}</span>
+                            <span className="font-medium text-gray-100">{item.value} detections</span>
                           </div>
                         ))}
                     </div>
@@ -712,9 +712,9 @@ export default function AnalysisPage() {
                           return acc;
                         }, {} as Record<string, number>)
                       ).map(([status, count], i) => (
-                        <div key={i} className="flex justify-between items-center py-1 border-b">
-                          <span className="text-sm capitalize">{status.replace('_', ' ')}</span>
-                          <span className="font-medium">{count}</span>
+                        <div key={i} className="flex justify-between items-center py-1 border-b border-gray-700">
+                          <span className="text-sm text-gray-300 capitalize">{status.replace('_', ' ')}</span>
+                          <span className="font-medium text-gray-100">{count}</span>
                         </div>
                       ))}
                     </div>

@@ -174,7 +174,7 @@ export default function TrainStatusCard({ train: initialTrain, alerts = [] }: Tr
 
 {/* Outer semi-circle of the gauge */}
 <div className="absolute w-40 h-20 overflow-hidden">
-  <div className="w-40 h-40 rounded-full border-8 border-gray-800" />
+  <div className="w-40 h-40 rounded-full mt-2 border-8 border-white/20" />
 </div>
 
 {/* Speed gauge ticks */}
