@@ -876,7 +876,7 @@ export default function Home() {
                   PyTorch
                 </span>
                 <span className="bg-blue-900/40 text-blue-400 px-3 py-1 rounded-full text-sm">
-                  YOLO
+                  YOLOv8
                 </span>
               </div>
             </motion.div>
@@ -896,10 +896,7 @@ export default function Home() {
                   Node.js
                 </span>
                 <span className="bg-blue-900/40 text-blue-400 px-3 py-1 rounded-full text-sm">
-                  PostgreSQL
-                </span>
-                <span className="bg-blue-900/40 text-blue-400 px-3 py-1 rounded-full text-sm">
-                  Firebase
+                  MONGODB
                 </span>
               </div>
             </motion.div>
