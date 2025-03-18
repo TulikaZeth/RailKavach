@@ -12,6 +12,11 @@ import {
   LineChart,
   Clock,
   Play,
+  Camera,
+  Bell,
+  Gauge,
+  Badge,
+  ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -63,6 +68,30 @@ export default function Home() {
       }
     }
   };
+
+  const steps = [
+    {
+      id: 1,
+      title: "Detection",
+      description: "Strategically placed cameras along railway tracks capture and analyze images to detect animals.",
+      icon: Camera,
+      color: "bg-blue-600",
+    },
+    {
+      id: 2,
+      title: "Alert System",
+      description: "When an animal is detected, alerts are sent to the nearest station and approaching trains.",
+      icon: Bell,
+      color: "bg-indigo-600",
+    },
+    {
+      id: 3,
+      title: "Speed Reduction",
+      description: "Trains automatically reduce speed at 5km and further slow down at 2km if the animal remains on track.",
+      icon: Gauge,
+      color: "bg-violet-600",
+    },
+  ];
 
   const spanVariants = {
     hidden: { opacity: 0, scale: 0.8 },
@@ -560,134 +589,94 @@ export default function Home() {
 
       {/* How It Works Section */}
       <section id="how-it-works" className="py-16 md:py-24 bg-slate-800">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
-              How Rail Kavach Works
-            </h2>
-            <p className="text-gray-400 max-w-2xl mx-auto text-lg">
-              A comprehensive system that monitors, alerts, and takes action to
-              prevent animal accidents.
-            </p>
-          </motion.div>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
+            How Rail Kavach Works
+          </h2>
+          <p className="text-gray-400 max-w-2xl mx-auto text-lg">
+            A comprehensive system that monitors, alerts, and takes action to prevent animal accidents.
+          </p>
+        </motion.div>
 
-          <div className="relative">
-            {/* Timeline line */}
-            <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-blue-900"></div>
+        <div className="relative">
+          {/* Timeline line */}
+          <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-blue-900"></div>
 
-            {/* Timeline items */}
-            <div className="space-y-12 md:space-y-0">
-              {/* Step 1 */}
+          <div className="space-y-12 md:space-y-16">
+            {steps.map((step, index) => (
               <motion.div
-                initial={{ opacity: 0, x: -50 }}
+                key={step.id}
+                initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
                 viewport={{ once: true }}
                 className="md:grid md:grid-cols-2 md:gap-8 items-center"
               >
-                <div className="md:text-right pb-8 md:pb-0">
-                  <div className="inline-block p-6 rounded-lg bg-slate-700 mb-4 shadow-lg">
-                    <h3 className="text-2xl font-bold text-white mb-3">
-                      1. Detection
-                    </h3>
-                    <p className="text-gray-300">
-                      Strategically placed cameras along railway tracks capture
-                      and analyze images to detect animals.
-                    </p>
-                  </div>
+                <div className={`${index % 2 === 0 ? "md:text-right" : "md:order-2"} pb-8 md:pb-0`}>
+                  <Card className="bg-slate-700 border-none shadow-lg">
+                    <CardHeader className="pb-2">
+                      <Badge className={`${step.color} hover:${step.color} text-white mb-2 self-start`}>
+                        Step {step.id}
+                      </Badge>
+                      <CardTitle className="text-2xl font-bold text-white">
+                        {step.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-300">{step.description}</p>
+                    </CardContent>
+                  </Card>
                 </div>
-                <div className="relative md:ml-8">
-                  {/* Timeline dot */}
-                  <div className="hidden md:block absolute -left-12 top-1/2 transform -translate-y-1/2 w-6 h-6 rounded-full bg-blue-600 border-4 border-slate-800 z-10"></div>
 
-                  <div className="rounded-lg overflow-hidden h-48 relative shadow-lg">
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-800 opacity-75 z-10"></div>
-                    <img
-                      src="/images/detection.jpg"
-                      alt="Detection"
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
+                <div className={`relative ${index % 2 === 0 ? "md:ml-8" : "md:mr-8 md:order-1"}`}>
+                  {/* Timeline dot */}
+                  <div className={`hidden md:flex absolute ${
+                    index % 2 === 0 ? "-left-12" : "-right-12"
+                  } top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-full ${step.color} border-4 border-slate-800 z-10 items-center justify-center`}>
+                    <step.icon className="w-6 h-6 text-white" />
                   </div>
+
+                  <Card className="bg-gradient-to-br from-blue-800 to-indigo-900 border-none shadow-xl h-64 flex items-center justify-center relative overflow-hidden">
+                    <div className="absolute inset-0 bg-blue-600 opacity-10 z-0">
+                      <div className="w-full h-full" style={{ 
+                        backgroundImage: `radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.2) 0%, transparent 50%), 
+                                        radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)` 
+                      }}></div>
+                    </div>
+                    
+                    <div className="relative z-10 text-center p-6">
+                      <div className="mb-4 mx-auto">
+                        <step.icon className="w-16 h-16 text-white mx-auto" />
+                      </div>
+                      <h4 className="text-xl font-bold text-white mb-2">
+                        {step.title}
+                      </h4>
+                      
+                      {index < steps.length - 1 && (
+                        <motion.div 
+                          className="absolute bottom-4 right-4"
+                          animate={{ x: [0, 5, 0] }}
+                          transition={{ repeat: Infinity, duration: 1.5 }}
+                        >
+                          {/* <ArrowRight className="w-6 h-6 text-blue-300" /> */}
+                        </motion.div>
+                      )}
+                    </div>
+                  </Card>
                 </div>
               </motion.div>
-
-              {/* Step 2 */}
-              <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6 }}
-                viewport={{ once: true }}
-                className="md:grid md:grid-cols-2 md:gap-8 items-center"
-              >
-                <div className="md:order-2 md:text-left pb-8 md:pb-0">
-                  <div className="inline-block p-6 rounded-lg bg-slate-700 mb-4 shadow-lg">
-                    <h3 className="text-2xl font-bold text-white mb-3">
-                      2. Alert System
-                    </h3>
-                    <p className="text-gray-300">
-                      When an animal is detected, alerts are sent to the nearest
-                      station and approaching trains.
-                    </p>
-                  </div>
-                </div>
-                <div className="relative md:order-1 md:mr-8">
-                  {/* Timeline dot */}
-                  <div className="hidden md:block absolute -right-12 top-1/2 transform -translate-y-1/2 w-6 h-6 rounded-full bg-blue-600 border-4 border-slate-800 z-10"></div>
-
-                  <div className="rounded-lg overflow-hidden h-48 relative shadow-lg">
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-800 opacity-75 z-10"></div>
-                    <img
-                      src="/images/alert-system.jpg"
-                      alt="Alert System"
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Step 3 */}
-              <motion.div
-                initial={{ opacity: 0, x: -50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6 }}
-                viewport={{ once: true }}
-                className="md:grid md:grid-cols-2 md:gap-8 items-center"
-              >
-                <div className="md:text-right pb-8 md:pb-0">
-                  <div className="inline-block p-6 rounded-lg bg-slate-700 mb-4 shadow-lg">
-                    <h3 className="text-2xl font-bold text-white mb-3">
-                      3. Speed Reduction
-                    </h3>
-                    <p className="text-gray-300">
-                      Trains automatically reduce speed at 5km and further slow
-                      down at 2km if the animal remains on track.
-                    </p>
-                  </div>
-                </div>
-                <div className="relative md:ml-8">
-                  {/* Timeline dot */}
-                  <div className="hidden md:block absolute -left-12 top-1/2 transform -translate-y-1/2 w-6 h-6 rounded-full bg-blue-600 border-4 border-slate-800 z-10"></div>
-
-                  <div className="rounded-lg overflow-hidden h-48 relative shadow-lg">
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-800 opacity-75 z-10"></div>
-                    <img
-                      src="/images/speed-reduction.jpg"
-                      alt="Speed Reduction"
-                      className="absolute inset-0 w-full h-full object-cover"
-                    />
-                  </div>
-                </div>
-              </motion.div>
-            </div>
+            ))}
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
       {/* Business Model Section */}
       <section id="business" className="py-16 md:py-24">
