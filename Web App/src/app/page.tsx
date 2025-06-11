@@ -145,7 +145,7 @@ export default function Home() {
                   Contact
                 </Link>
                 <Button
-                  onClick={() => router.push("/dashboard")}
+                  onClick={() => router.push("/quickaccess")}
                   className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer ml-4"
                 >
                   Get Started
@@ -343,13 +343,12 @@ export default function Home() {
                 >
                   <div className="flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
-                    <span className="text-xs font-medium text-green-400">98% Detection Accuracy</span>
+                    <span className="text-xs font-medium text-green-400">85% Detection Accuracy</span>
                   </div>
                 </motion.div>
               </div>
             </div>
             
-            {/* Floating card element */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
@@ -426,7 +425,7 @@ export default function Home() {
                 </div>
                 <div>
                   <p className="text-gray-400 text-sm">Detection Accuracy</p>
-                  <p className="text-white text-2xl font-bold">95%</p>
+                  <p className="text-white text-2xl font-bold">85%</p>
                 </div>
               </div>
             </motion.div>

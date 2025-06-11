@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { updateAllTrains } from '@/services/trainTrackingService';
 import { Train } from '@/models/schema';
-import { connectToDatabase } from '@/lib/db';
+import connectToDatabase from '@/lib/db';
 
 // Simple API key validation
 const validateApiKey = (request: NextRequest): boolean => {

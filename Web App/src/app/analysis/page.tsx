@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import dynamic from 'next/dynamic';
 
-// Basic components we'll use directly, without shadcn/ui
 const Card = ({ children, className = '' }: { children: React.ReactNode, className?: string }) => (
   <div className={`bg-[#1e1e1e] rounded-lg shadow-md overflow-hidden ${className}`}>
     {children}
@@ -27,7 +26,6 @@ const CardContent = ({ children }: { children: React.ReactNode }) => (
   <div className="px-6 py-4">{children}</div>
 );
 
-// Dynamically import the map component to avoid SSR issues
 const MapWithNoSSR = dynamic(() => import('@/components/Map'), {
   ssr: false
 });
@@ -78,7 +76,7 @@ export default function AnalysisPage() {
   const [railwaySection, setRailwaySection] = useState('all');
   const [heatmapData, setHeatmapData] = useState<HeatmapPoint[]>([]);
   const [availableSections, setAvailableSections] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState('map');
+  const [activeTab, setActiveTab] = useState('stats');
   const [dateFrom, setDateFrom] = useState<string>(() => {
     const d = new Date();
     d.setDate(d.getDate() - 30);
@@ -118,7 +116,6 @@ export default function AnalysisPage() {
       
       setDetections(result.data);
       
-      // Extract unique railway sections
       const sections = Array.from(new Set(result.data.map((d: Detection) => d.camera.railwaySection)));
       setAvailableSections(['all', ...sections]);
       
@@ -435,7 +432,6 @@ export default function AnalysisPage() {
             Refresh Data
           </button>
           <button 
-            onClick={() => alert('Export functionality would be implemented here')}
             className="px-4 py-2 bg-gray-700 text-gray-100 rounded-md hover:bg-gray-600 transition-colors"
           >
             Export Data
@@ -446,16 +442,16 @@ export default function AnalysisPage() {
       <div className="mb-6">
         <div className="border-b border-gray-700">
           <nav className="flex -mb-px">
-            <button
+            {/* <button
               className={`py-2 px-4 text-center border-b-2 font-medium text-sm ${
                 activeTab === 'map' 
                   ? 'border-blue-500 text-blue-400' 
                   : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500'
               }`}
-              onClick={() => setActiveTab('map')}
+              onClick={() => setActiveTab('trends')}
             >
               Hotspot Map
-            </button>
+            </button> */}
             <button
               className={`py-2 px-4 text-center border-b-2 font-medium text-sm ${
                 activeTab === 'stats' 
@@ -621,7 +617,6 @@ export default function AnalysisPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="h-64">
-                    {/* Simple trend line visualization */}
                     <div className="h-full flex flex-col">
                       <div className="flex-1 relative">
                         {getTrendData().map((item, i, arr) => {

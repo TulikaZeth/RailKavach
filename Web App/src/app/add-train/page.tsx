@@ -21,7 +21,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { Loader2, Train as TrainIcon, X, AlertTriangle } from 'lucide-react';
+import { Loader2, Train as TrainIcon, X,  ChevronLeft, User, MapPin, Gauge } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface DriverInfo {
@@ -113,6 +113,7 @@ export default function AddTrainPage() {
       toast({
         title: "Train Added Successfully",
         description: `Train ${formData.trainName} has been added to the system.`,
+        className: "bg-blue-900 text-white border-blue-700"
       });
       
       router.push('/trains');
@@ -122,6 +123,7 @@ export default function AddTrainPage() {
         title: "Error Adding Train",
         description: "There was a problem adding the train. Please try again.",
         variant: "destructive",
+        className: "bg-red-900 text-white border-red-700"
       });
     } finally {
       setIsSubmitting(false);
@@ -134,208 +136,258 @@ export default function AddTrainPage() {
     exit: { opacity: 0, y: -20 }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'running': return 'bg-emerald-500';
+      case 'stopped': return 'bg-red-500';
+      case 'maintenance': return 'bg-amber-500';
+      default: return 'bg-gray-500';
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-4 md:p-8">
-      <motion.div
-        variants={pageVariants}
-        initial="initial"
-        animate="animate"
-        exit="exit"
-        transition={{ duration: 0.4 }}
-        className="max-w-4xl mx-auto"
-      >
-        <div className="flex items-center mb-6">
-          <TrainIcon className="mr-2 h-8 w-8 text-yellow-400" />
-          <h1 className="text-2xl font-bold text-yellow-400">Add New Train</h1>
-        </div>
+    <div className="min-h-screen bg-slate-900 text-slate-100">
+      <div className="container py-10 mx-auto max-w-4xl">
+        <Button 
+          variant="ghost" 
+          className="mb-6 text-blue-400 hover:text-blue-300 hover:bg-blue-950 flex items-center" 
+          onClick={() => router.push('/trains')}
+        >
+          <ChevronLeft className="h-4 w-4 mr-1" />
+          Back to Train Management
+        </Button>
         
-        <Card className="border-slate-700 bg-slate-800 shadow-lg">
-          <CardHeader className="border-b border-slate-700 bg-slate-800">
-            <CardTitle className="text-xl text-yellow-400 flex items-center">
-              <span className="bg-yellow-400 text-slate-900 rounded-full p-1 mr-2">
-                <TrainIcon className="h-5 w-5" />
-              </span>
-              Train Information
-            </CardTitle>
-            <CardDescription className="text-slate-400">
-              Enter the details of the new train to add it to the monitoring system
-            </CardDescription>
-          </CardHeader>
+        <motion.div
+          variants={pageVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          transition={{ duration: 0.4 }}
+        >
+          <div className="mb-8 flex items-center">
+            <div className="p-3 bg-blue-800 rounded-lg mr-4">
+              <TrainIcon className="h-8 w-8 text-blue-200" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-blue-200">Railway Management System</h1>
+              <p className="text-slate-400">Train Registration Portal</p>
+            </div>
+          </div>
           
-          <form onSubmit={handleSubmit}>
-            <CardContent className="pt-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="trainNumber" className="text-slate-300">Train Number *</Label>
-                  <Input
-                    id="trainNumber"
-                    name="trainNumber"
-                    value={formData.trainNumber}
-                    onChange={handleChange}
-                    required
-                    className="bg-slate-900 border-slate-700 text-slate-100 focus:border-yellow-400 focus:ring-yellow-400"
-                  />
+          <Card className="border-blue-900 bg-slate-800 shadow-xl shadow-blue-950/30">
+            <CardHeader className="border-b border-blue-900 bg-slate-850">
+              <div className="flex items-center">
+                <div className="p-2 bg-blue-900 rounded-md mr-3">
+                  <TrainIcon className="h-5 w-5 text-blue-200" />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="trainName" className="text-slate-300">Train Name *</Label>
-                  <Input
-                    id="trainName"
-                    name="trainName"
-                    value={formData.trainName}
-                    onChange={handleChange}
-                    required
-                    className="bg-slate-900 border-slate-700 text-slate-100 focus:border-yellow-400 focus:ring-yellow-400"
-                  />
+                <div>
+                  <CardTitle className="text-2xl text-blue-200">Add New Train</CardTitle>
+                  <CardDescription className="text-slate-400 mt-1">
+                    Enter the details of the new train to add it to the monitoring system
+                  </CardDescription>
                 </div>
               </div>
-              
-              <div className="space-y-2">
-                <Label className="text-slate-300">Current Location (Coordinates)</Label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="longitude" className="text-slate-400 text-sm">Longitude</Label>
-                    <Input
-                      id="longitude"
-                      type="number"
-                      step="0.000001"
-                      value={formData.currentLocation.coordinates[0]}
-                      onChange={(e) => handleLocationChange(e, 0)}
-                      placeholder="0.000000"
-                      className="bg-slate-900 border-slate-700 text-slate-100 focus:border-yellow-400 focus:ring-yellow-400"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="latitude" className="text-slate-400 text-sm">Latitude</Label>
-                    <Input
-                      id="latitude"
-                      type="number"
-                      step="0.000001"
-                      value={formData.currentLocation.coordinates[1]}
-                      onChange={(e) => handleLocationChange(e, 1)}
-                      placeholder="0.000000"
-                      className="bg-slate-900 border-slate-700 text-slate-100 focus:border-yellow-400 focus:ring-yellow-400"
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="currentSpeed" className="text-slate-300">Current Speed (km/h)</Label>
-                  <Input
-                    id="currentSpeed"
-                    type="number"
-                    value={formData.currentSpeed}
-                    onChange={(e) => setFormData({...formData, currentSpeed: parseFloat(e.target.value)})}
-                    placeholder="0"
-                    className="bg-slate-900 border-slate-700 text-slate-100 focus:border-yellow-400 focus:ring-yellow-400"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="status" className="text-slate-300">Status</Label>
-                  <Select
-                    value={formData.status}
-                    onValueChange={handleStatusChange}
-                  >
-                    <SelectTrigger className="bg-slate-900 border-slate-700 text-slate-100 focus:border-yellow-400 focus:ring-yellow-400">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-800 border-slate-700 text-slate-100">
-                      <SelectItem value="running" className="hover:bg-slate-700 focus:bg-slate-700">
-                        <div className="flex items-center">
-                          <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
-                          Running
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="stopped" className="hover:bg-slate-700 focus:bg-slate-700">
-                        <div className="flex items-center">
-                          <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
-                          Stopped
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="maintenance" className="hover:bg-slate-700 focus:bg-slate-700">
-                        <div className="flex items-center">
-                          <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
-                          Maintenance
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <div className="space-y-4 border border-slate-700 rounded-lg p-4 bg-slate-850">
-                <div className="flex items-center text-yellow-400 mb-2">
-                  <AlertTriangle className="h-4 w-4 mr-2" />
-                  <h3 className="font-medium">Driver Information</h3>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="driver.name" className="text-slate-300">Driver Name</Label>
-                    <Input
-                      id="driver.name"
-                      name="driver.name"
-                      value={formData.driver.name}
-                      onChange={handleChange}
-                      className="bg-slate-900 border-slate-700 text-slate-100 focus:border-yellow-400 focus:ring-yellow-400"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="driver.contactNumber" className="text-slate-300">Contact Number</Label>
-                    <Input
-                      id="driver.contactNumber"
-                      name="driver.contactNumber"
-                      value={formData.driver.contactNumber}
-                      onChange={handleChange}
-                      className="bg-slate-900 border-slate-700 text-slate-100 focus:border-yellow-400 focus:ring-yellow-400"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="driver.id" className="text-slate-300">Driver ID</Label>
-                    <Input
-                      id="driver.id"
-                      name="driver.id"
-                      value={formData.driver.id}
-                      onChange={handleChange}
-                      className="bg-slate-900 border-slate-700 text-slate-100 focus:border-yellow-400 focus:ring-yellow-400"
-                    />
-                  </div>
-                </div>
-              </div>
-            </CardContent>
+            </CardHeader>
             
-            <CardFooter className="border-t border-slate-700 bg-slate-800 flex justify-between">
-              <Button 
-                type="button" 
-                variant="outline"
-                onClick={() => router.push('/trains')}
-                className="border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-slate-100"
-              >
-                <X className="mr-2 h-4 w-4" />
-                Cancel
-              </Button>
+            <form onSubmit={handleSubmit}>
+              <CardContent className="pt-6 space-y-6">
+                <div className="p-4 bg-blue-950/50 rounded-lg border border-blue-900/50 mb-2">
+                  <h3 className="text-blue-300 text-sm font-medium mb-3 flex items-center">
+                    <TrainIcon className="h-4 w-4 mr-1" /> Basic Train Information
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label htmlFor="trainNumber" className="text-blue-200">Train Number *</Label>
+                      <Input
+                        id="trainNumber"
+                        name="trainNumber"
+                        value={formData.trainNumber}
+                        onChange={handleChange}
+                        required
+                        className="bg-slate-900 border-blue-900 focus:border-blue-700 text-slate-200 placeholder:text-slate-500"
+                      />
+                      <p className="text-xs text-slate-500">Unique identifier for the train</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="trainName" className="text-blue-200">Train Name *</Label>
+                      <Input
+                        id="trainName"
+                        name="trainName"
+                        value={formData.trainName}
+                        onChange={handleChange}
+                        required
+                        className="bg-slate-900 border-blue-900 focus:border-blue-700 text-slate-200 placeholder:text-slate-500"
+                      />
+                      <p className="text-xs text-slate-500">Display name for the train</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="p-4 bg-blue-950/50 rounded-lg border border-blue-900/50 mb-2">
+                  <h3 className="text-blue-300 text-sm font-medium mb-3 flex items-center">
+                    <MapPin className="h-4 w-4 mr-1" /> Location & Status
+                  </h3>
+                  <div className="space-y-6">
+                    <div>
+                      <Label className="text-blue-200 mb-2 block">Current Location (Coordinates)</Label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="longitude" className="text-slate-400 text-sm">Longitude</Label>
+                          <Input
+                            id="longitude"
+                            type="number"
+                            step="0.000001"
+                            value={formData.currentLocation.coordinates[0]}
+                            onChange={(e) => handleLocationChange(e, 0)}
+                            placeholder="0.000000"
+                            className="bg-slate-900 border-blue-900 focus:border-blue-700 text-slate-200 placeholder:text-slate-500"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="latitude" className="text-slate-400 text-sm">Latitude</Label>
+                          <Input
+                            id="latitude"
+                            type="number"
+                            step="0.000001"
+                            value={formData.currentLocation.coordinates[1]}
+                            onChange={(e) => handleLocationChange(e, 1)}
+                            placeholder="0.000000"
+                            className="bg-slate-900 border-blue-900 focus:border-blue-700 text-slate-200 placeholder:text-slate-500"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="currentSpeed" className="text-blue-200 flex items-center">
+                          <Gauge className="h-4 w-4 mr-1" /> Current Speed (km/h)
+                        </Label>
+                        <Input
+                          id="currentSpeed"
+                          type="number"
+                          value={formData.currentSpeed}
+                          onChange={(e) => setFormData({...formData, currentSpeed: parseFloat(e.target.value)})}
+                          placeholder="0"
+                          className="bg-slate-900 border-blue-900 focus:border-blue-700 text-slate-200 placeholder:text-slate-500"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="status" className="text-blue-200">Current Status</Label>
+                        <Select
+                          value={formData.status}
+                          onValueChange={handleStatusChange}
+                        >
+                          <SelectTrigger className="bg-slate-900 border-blue-900 focus:border-blue-700 text-slate-200">
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-slate-800 border-blue-900 text-slate-200">
+                            <SelectItem value="running" className="hover:bg-blue-900 focus:bg-blue-900">
+                              <div className="flex items-center">
+                                <span className="h-2 w-2 rounded-full bg-emerald-500 mr-2"></span>
+                                Running
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="stopped" className="hover:bg-blue-900 focus:bg-blue-900">
+                              <div className="flex items-center">
+                                <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
+                                Stopped
+                              </div>
+                            </SelectItem>
+                            <SelectItem value="maintenance" className="hover:bg-blue-900 focus:bg-blue-900">
+                              <div className="flex items-center">
+                                <span className="h-2 w-2 rounded-full bg-amber-500 mr-2"></span>
+                                Maintenance
+                              </div>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <div className="mt-2 flex items-center">
+                          <span className={`h-3 w-3 rounded-full ${getStatusColor(formData.status)} mr-2`}></span>
+                          <span className="text-xs text-slate-400">
+                            Current selection: {formData.status.charAt(0).toUpperCase() + formData.status.slice(1)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="p-4 bg-blue-950/50 rounded-lg border border-blue-900/50">
+                  <h3 className="text-blue-300 text-sm font-medium mb-3 flex items-center">
+                    <User className="h-4 w-4 mr-1" /> Driver Information
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="driver.name" className="text-blue-200">Driver Name</Label>
+                      <Input
+                        id="driver.name"
+                        name="driver.name"
+                        value={formData.driver.name}
+                        onChange={handleChange}
+                        className="bg-slate-900 border-blue-900 focus:border-blue-700 text-slate-200 placeholder:text-slate-500"
+                        placeholder="Full name"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="driver.contactNumber" className="text-blue-200">Contact Number</Label>
+                      <Input
+                        id="driver.contactNumber"
+                        name="driver.contactNumber"
+                        value={formData.driver.contactNumber}
+                        onChange={handleChange}
+                        className="bg-slate-900 border-blue-900 focus:border-blue-700 text-slate-200 placeholder:text-slate-500"
+                        placeholder="+91 1234567890"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="driver.id" className="text-blue-200">Driver ID</Label>
+                      <Input
+                        id="driver.id"
+                        name="driver.id"
+                        value={formData.driver.id}
+                        onChange={handleChange}
+                        className="bg-slate-900 border-blue-900 focus:border-blue-700 text-slate-200 placeholder:text-slate-500"
+                        placeholder="DRV-12345"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
               
-              <Button 
-                type="submit" 
-                disabled={isSubmitting}
-                className="bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-medium"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Adding...
-                  </>
-                ) : (
-                  <>
-                    <TrainIcon className="mr-2 h-4 w-4" />
-                    Add Train
-                  </>
-                )}
-              </Button>
-            </CardFooter>
-          </form>
-        </Card>
-      </motion.div>
+              <CardFooter className="border-t border-blue-900 bg-slate-850 flex justify-between py-4">
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  onClick={() => router.push('/trains')}
+                  className="border-blue-800 text-blue-300 hover:bg-blue-900 hover:text-blue-200"
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  Cancel
+                </Button>
+                
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="bg-blue-700 hover:bg-blue-600 text-white"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Adding...
+                    </>
+                  ) : (
+                    <>
+                      <TrainIcon className="mr-2 h-4 w-4" />
+                      Add Train
+                    </>
+                  )}
+                </Button>
+              </CardFooter>
+            </form>
+          </Card>
+        </motion.div>
+      </div>
     </div>
   );
 }

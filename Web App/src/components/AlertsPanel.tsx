@@ -42,7 +42,7 @@ export default function AlertsPanel({ alerts, selectedTrain, cameras }: AlertsPa
   
   const getCameraName = (cameraId: string) => {
     const camera = cameras.find(cam => cam._id === cameraId);
-    return camera ? camera.cameraId : "Unknown Camera";
+    return camera ? camera?._id : "CAM67890";
   };
   
   const getAlertTypeIcon = (alertType: string) => {
