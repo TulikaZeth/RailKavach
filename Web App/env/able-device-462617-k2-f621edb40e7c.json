@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "id",
+  "private_key_id": "key",
+  "private_key": "-----BEGIN PRIVATE \nF2ykK65smdURWGylk/tYEko3piv8oZ2hP85wumLg9QCFFa7WADU9JuoqR2r991v2\nrKlSbhQT1IzOLJT9sFnn8l9xvWvX8qEBaWv3ze6wAlfu396KnHM3JfWg/Dztx19U\nuttkPOF+8k/dqW7JPvS0CsGipgRzTZ0BGMXcHRTxAoGBAN8QLCrLN9+HPFcO/WU1\n2U2d28zyGVFEwCUIz9Lgu0wMFaPR8AULeGu6veBOP9uo338jwl5pBXAvXQkClcQP\nG6+2y/6Iyi6q1g2vYas4c2TfWbplAdyXioEn+HFhzrMItXa+K1pPIU4aXHVMqw4X\nAu7xZQgC9G8FEiwVXSaDg2on\n-----END PRIVATE KEY-----\n",
+  "client_email": "translation-access@test.iam.gserviceaccount.com",
+  "client_id": "client_id",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/translation-access%40able-device-462617-k2.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

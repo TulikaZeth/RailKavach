@@ -25,8 +25,17 @@ import {
   Shield,
   AlertTriangle,
   Bell,
+  Languages,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import TranslatedText from "@/components/TranslatedText";
+import { useLanguage } from "@/context/LanguageContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Dashboard() {
   const [trains, setTrains] = useState<Train[]>([]);
@@ -35,6 +44,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedTrain, setSelectedTrain] = useState<string | null>(null);
   const [selectedTab, setSelectedTab] = useState<string>("details");
+  const { language, setLanguage, supportedLanguages } = useLanguage();
 
   useEffect(() => {
     const loadData = async () => {
@@ -150,13 +160,17 @@ export default function Dashboard() {
   const getStatusText = (status: string) => {
     switch (status) {
       case "on_time":
-        return "On Time";
+        return <TranslatedText text="On Time" />;
       case "delayed":
-        return "Delayed";
+        return <TranslatedText text="Delayed" />;
       case "emergency":
-        return "Emergency";
+        return <TranslatedText text="Emergency" />;
       default:
-        return status.charAt(0).toUpperCase() + status.slice(1);
+        return (
+          <TranslatedText
+            text={status.charAt(0).toUpperCase() + status.slice(1)}
+          />
+        );
     }
   };
 
@@ -193,6 +207,31 @@ export default function Dashboard() {
           </div>
 
           <div className="flex items-center gap-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="bg-slate-800 hover:bg-slate-700 text-slate-200 h-10 w-10 rounded-lg border border-slate-700"
+                >
+                  <Languages className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-gray-800 border-gray-700">
+                {supportedLanguages.map((lang) => (
+                  <DropdownMenuItem
+                    key={lang.code}
+                    className={`hover:bg-gray-700 cursor-pointer ${
+                      language === lang.code ? "text-blue-400" : "text-gray-200"
+                    }`}
+                    onClick={() => setLanguage(lang.code)}
+                  >
+                    {lang.name}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {/* Live status indicator */}
             <div className="hidden md:flex items-center gap-2 bg-slate-800 py-1 px-3 rounded-full">
               <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
@@ -456,8 +495,9 @@ export default function Dashboard() {
                     Alert Dashboard
                   </CardTitle>
                   <CardDescription className="text-gray-400">
-                    Monitoring {alerts.length} alerts across {trains.length}{" "}
-                    trains
+                    <TranslatedText
+                      text={`Monitoring ${alerts.length} alerts across ${trains.length} trains`}
+                    />
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

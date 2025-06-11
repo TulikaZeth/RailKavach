@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { Spotlight } from "@/components/ui/spotlight";
-
-
+import { LanguageProvider } from "@/context/LanguageContext";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -17,16 +16,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-      >
+      <body>
+        <LanguageProvider>
           <Spotlight
-          className="-top-40 -z-50 left-0 md:left-60 md:-top-20"
-          fill="white"
-        />
-        {children}
-        <Toaster />
-        
-
+            className="-top-40 -z-50 left-0 md:left-60 md:-top-20"
+            fill="white"
+          />
+          {children}
+          <Toaster />
+        </LanguageProvider>
       </body>
     </html>
   );
